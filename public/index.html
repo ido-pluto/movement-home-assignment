@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User List</title>
+</head>
+
+<h1>Test API</h1>
+
+<div class="buttons">
+    <button onclick="signup()">signup</button>
+    <button onclick="login()">login</button>
+    <button onclick="logout()">logout</button> |
+    <button onclick="getUser()">get user</button>
+    <button onclick="getUsers()">get users</button>
+    <button onclick="deleteUser()">delete user by id</button> |
+    <button onclick="updateUser()">update</button>
+    <button onclick="createUser()">create</button>
+</div>
+
+<br>
+<textarea id="results"></textarea>
+
+<body>
+    <script>
+        const result = document.querySelector('#results');
+
+        async function post(url, body = {}) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(body),
+                });
+                const data = await response.json();
+                result.value = data.error || 'success';
+            } catch (error) {
+                alert(error);
+            }
+        }
+
+        function tryParse(data) {
+            try {
+                return JSON.stringify(JSON.parse(data), null, 2);
+            } catch (error) {
+                return data;
+            }
+        }
+
+        async function signup() {
+            post('/api/auth/signup', {
+                "email": "admin@admin.admin",
+                "firstName": "admin",
+                "lastName": "admin",
+                "password": "adminadmin",
+                "avatar": "https://cdn2.thecatapi.com/images/HYTJQgs2M.jpg"
+            });
+        }
+
+        async function login() {
+            post('/api/auth/login', {
+                "email": "admin@admin.admin",
+                "password": "adminadmin",
+            });
+        }
+
+        async function logout() {
+            post('/api/auth/logout');
+        }
+
+        async function getUser() {
+            try {
+                const userId = prompt('Enter user id');
+                if (!userId) return alert('No user id');
+
+                const response = await fetch(`/api/user/getUser/${userId}`);
+                const data = await response.text();
+                result.value = tryParse(data);
+            } catch (error) {
+                alert(error);
+            }
+        }
+
+        async function getUsers() {
+            try {
+                const response = await fetch('/api/user/getUsers/0');
+                const data = await response.text();
+                result.value = tryParse(data);
+            } catch (error) {
+                alert(error);
+            }
+        }
+
+        async function deleteUser() {
+            const userId = prompt('Enter user id');
+            if (!userId) return alert('No user id');
+
+            const response = await fetch(`/api/user/deleteUser/${userId}`, {
+                method: 'DELETE',
+            });
+
+            result.value = tryParse(await response.text());
+        }
+
+        async function updateUser() {
+            try {
+                const userContent = JSON.parse(result.value);
+                if (userContent instanceof Array) return alert('Array is not allowed');
+                const id = userContent._id;
+                delete userContent._id;
+
+                const response = await fetch(`/api/user/updateUser/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userContent),
+                });
+
+                result.value = tryParse(await response.text());
+            } catch (error) {
+                alert(error);
+            }
+        }
+
+        async function createUser() {
+            try {
+                const userContent = JSON.parse(result.value);
+                if (userContent instanceof Array) return alert('Array is not allowed');
+                delete userContent._id;
+
+                const response = await fetch(`/api/user/createUser`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userContent),
+                });
+
+                result.value = tryParse(await response.text());
+            } catch (error) {
+                alert(error);
+            }
+        }
+
+    </script>
+</body>
+
+</html>
+
+<style>
+    html {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 40px;
+    }
+
+    textarea {
+        width: 100%;
+        height: 800px;
+        margin-top: 10px;
+        padding: 10px;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    button {
+        background: none;
+        border: solid 1px #4c90af;
+        border-radius: 3px;
+        padding: 10px 20px;
+        text-align: center;
+    }
+
+    button:hover {
+        background-color: #7bb2cb3d;
+        cursor: pointer;
+    }
+</style>
