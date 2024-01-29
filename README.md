@@ -42,7 +42,7 @@ The database is MongoDB. On the first load of the application it will fetch the 
 
 ## WebUI
 
-Simple HTML page to interact with the API available at `http://localhost:3000/`
+Simple HTML page to interact with the API available at `https://localhost/`
 
 ## Running the project
 
@@ -51,7 +51,7 @@ Make sure you have MongoDB installed and running on your machine.
 ```bash
 npm install
 npm run build
-npm run start
+npm run start # with sudo if you using unix based system (port 443)
 ```
 
 #### Docker
